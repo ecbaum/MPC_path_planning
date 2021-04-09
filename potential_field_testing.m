@@ -32,12 +32,13 @@ epsilon = 0.5;
 u = @(x,y,x0,y0) ((x-x0).^2 + (y-y0).^2 + epsilon).^(-1);
 
 
-[X,Y] = meshgrid(-10:0.5:10,-10:0.5:10);
+[X,Y] = meshgrid(-10:0.3:10,-10:0.3:10);
 Z = u(X,Y,3,3);
 
 
 surf(X,Y,Z)
 xlabel('x')
 ylabel('y')
+title('pointwise repulsive potential function')
 
 

@@ -49,6 +49,7 @@ x0 = vertcat(0, 1)
 u_list = cos(range(0, N))
 
 res = sim(x0, u_list)
+
 res = horzcat(x0, res).toarray()
 tgrid = np.linspace(0, T, N+1)
 fig = plt.figure()
@@ -81,7 +82,7 @@ for k in range(N):
     opti.subject_to(x[:, k + 1] == F(x[:, k], u[:, k]))
 
 opti.subject_to(opti.bounded(-1, u, 1))
-opti.subject_to(x[:, 1] == p)
+opti.subject_to(x[:, 0] == p)
 
 opti.solver('ipopt')
 #opti.solver('sqpmethod', {'qpsol': 'osqp'})

@@ -1,7 +1,7 @@
 %% funnel potential 
 clear all; clc; close all
 
-theta = pi/3;
+theta = pi/4;
 
 R = [cos(theta), -sin(theta); sin(theta), cos(theta)];
 
@@ -27,7 +27,7 @@ ylabel('y')
 clear all; clc; close all
 
 
-epsilon = 0.5;
+epsilon = 1;
 
 u = @(x,y,x0,y0) ((x-x0).^2 + (y-y0).^2 + epsilon).^(-1);
 

@@ -1,22 +1,20 @@
-import numpy as np
+# import numpy as np
 from casadi import *
 
 
 class ConstantVelocityModel:
 
-    def __init__(self, T, N):
+    def __init__(self, T, h):
         self.T = T
-        self.N = N
-        self.h = T/N
+        self.h = h
+        self.N = int(T/h)
         self.F = None
         self.sim = None
-        self.x = None
-        self.u = None
         self.init_model()
 
     def init_model(self):
 
-        print('CV model. Sampling time: h = ', self.h)
+        print('CV model. Discrete time steps: N = ', self.N)
 
         x1 = MX.sym('x')  # state variables
         x2 = MX.sym('y')
@@ -46,7 +44,7 @@ class ConstantVelocityModel:
         self.sim = self.F.mapaccum(self.N)
 
 
-def init_optimizer(x0, u_lim, model):
+def init_optimizer(x0, xf, u_lim, model):
     N = model.N
     F = model.F
     u_min = u_lim[0]
@@ -58,7 +56,7 @@ def init_optimizer(x0, u_lim, model):
     u = opti.variable(2, N)
     p = opti.parameter(4, 1)  # Parameter (not optimized over)
 
-    opti.minimize(sumsqr(x))
+    opti.minimize(sumsqr(x - xf))
 
     for k in range(N):
         opti.subject_to(x[:, k + 1] == F(x[:, k], u[:, k]))

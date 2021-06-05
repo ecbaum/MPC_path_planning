@@ -44,7 +44,7 @@ class ConstantVelocityModel:
         self.sim = self.F.mapaccum(self.N)
 
 
-def init_optimizer(x0, xf, u_lim, model):
+def init_optimizer(x0, xf, u_lim, model, PRPF):
     N = model.N
     F = model.F
     u_min = u_lim[0]
@@ -56,8 +56,15 @@ def init_optimizer(x0, xf, u_lim, model):
     u = opti.variable(2, N)
     p = opti.parameter(4, 1)  # Parameter (not optimized over)
 
-    opti.minimize(sumsqr(x - xf))
+    stage_cost = 0.1*sumsqr(x - xf)
 
+    for k in range(N):
+        for i in range(np.shape(PRPF)[0]):
+            x_0 = PRPF[0, i]
+            y_0 = PRPF[1, i]
+            stage_cost = stage_cost + 1 / ((x[0, k] - x_0) ** 2 + (x[1, k] - y_0) ** 2 + 0.1)
+
+    opti.minimize(stage_cost)
     for k in range(N):
         opti.subject_to(x[:, k + 1] == F(x[:, k], u[:, k]))
 

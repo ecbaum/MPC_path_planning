@@ -1,23 +1,30 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from casadi import *
+from model_initalization import *
 
+model = ConstantVelocityModel(N=40, T=10)
 
-T = 1
+x0 = vertcat(10, 10, -3, 6)
+[opti, x, u] = init_optimizer(x0, [-2, 2], model)
 
-A = np.array([[1, 0, T, T**2/2], [0, 1, 0, T], [0, 0, 1, 0], [0, 0, 0, 1]])
-B = np.array([[0, 0], [0, 0], [1, 0], [0, 1]])
+sol = opti.solve()
 
-x0 = np.array([[0, 0, 0, 0]]).T
+res2 = sol.value(x)
+u2 = sol.value(u)
 
-n_iter = 100
-x_iter = np.zeros([4, n_iter])
-x_iter[:, 0] = x0.T
+tgrid = np.linspace(0, model.T, model.N+1)
 
-for i in range(n_iter-1):
-    u = np.random.rand(2, 1) - 0.5
-    x_i = x_iter[:, i:i+1]
+fig, axs = plt.subplots(3)
+axs[0].plot(tgrid, res2[0], label='x')
+axs[0].step(tgrid, vertcat(u2[0], np.nan), '-.', color='black', label='u_x')
+axs[0].set_xlabel('t')
+axs[0].legend()
+axs[1].plot(tgrid, res2[1], label='y')
+axs[1].step(tgrid, vertcat(u2[1], np.nan), '-.', color='black', label='u_y')
+axs[1].set_xlabel('t')
+axs[1].legend()
+axs[2].plot(res2[0, :], res2[1, :],'-.', label='position')
+axs[2].set_xlabel('x')
+axs[2].set_ylabel('y')
 
-    x_iter[:, i+1:i+2] = np.matmul(A, x_i) + np.matmul(B, u)
-
-
-plt.scatter(x_iter[0, :], x_iter[1, :])

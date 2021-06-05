@@ -64,8 +64,6 @@ opti.subject_to(opti.bounded(-2, u, 2))
 opti.subject_to(x[:, 0] == p)
 
 opti.solver('ipopt')
-
-
 opti.set_value(p, vertcat(10, 10, -3, 6))
 sol = opti.solve()
 

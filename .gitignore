@@ -2,3 +2,4 @@
 .idea/
 research/
 *.m~
+__pycache__/

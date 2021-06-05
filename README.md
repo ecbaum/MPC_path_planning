@@ -4,7 +4,7 @@ The goal of this project is to use model predictive control (MPC) to plan vehicl
 
 Structure of the project is as following
 
-1. Get familiar with CasADi and implement a basic nonlinear MPC problem to get familiar with how to work within the CasADi framework.
+1. Get familiar with CasADi and implement a basic nonlinear MPC problem to get familiar with how to work within the CasADi framework. 
 
 2. Use a motion model that can represent a reasonable vehicle trajectory like constant velocity or coordinate turn model. Generate trajectory given some constraints, initial state and a terminal state set
 

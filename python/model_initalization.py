@@ -4,10 +4,10 @@ from casadi import *
 
 class ConstantVelocityModel:
 
-    def __init__(self, T, h):
-        self.T = T
+    def __init__(self, N, h):
         self.h = h
-        self.N = int(T/h)
+        self.N = 40
+        self.T = N*h
         self.F = None
         self.sim = None
         self.init_model()
@@ -60,8 +60,8 @@ def init_optimizer(x0, xf, u_lim, model, PRPF):
 
     for k in range(N):
         for i in range(np.shape(PRPF)[0]):
-            x_0 = PRPF[0, i]
-            y_0 = PRPF[1, i]
+            x_0 = PRPF[i, 0]
+            y_0 = PRPF[i, 1]
             stage_cost = stage_cost + 1 / ((x[0, k] - x_0) ** 2 + (x[1, k] - y_0) ** 2 + 0.1)
 
     opti.minimize(stage_cost)

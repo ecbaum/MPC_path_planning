@@ -3,3 +3,5 @@
 research/
 *.m~
 __pycache__/
+old_functions/
+trash

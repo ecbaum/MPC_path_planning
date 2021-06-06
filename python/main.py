@@ -3,31 +3,41 @@ from controller import *
 from helpers import *
 from tqdm import tqdm
 
-model = ConstantVelocityModel(h=0.25)
+model = ConstantVelocityModel(h=0.2)
 
-sim_length = 280
-horizon_length = 5
-potential_weight = 3
-u_lim = [-1, 1]
-PRPF = np.array([[2, 2], [2, 1], [1, 4], [0, 3], [2, 3]])
+sim_length = 50
+horizon_length = 70
+potential_weight = 5
+epsilon = 0.01
+u_lim = 5*[-1, 1]
+PRPF = np.array([[2, 3], [2, 4], [2, 1], [3, 3]])
 
 x0 = vertcat(0, 0, 0, 0)
 xf = vertcat(5, 5, 0, 0)
+
+animate = 1
+plot_map = 1
+plot_state = 1
+
 
 x = np.zeros([4, sim_length + 1])
 x[:, 0:1] = x0
 
 u = np.zeros([2, sim_length])
 
-RHC = RecedingHorizonController(model, horizon_length, xf, u_lim, PRPF, potential_weight)
+RHC = RecedingHorizonController(model, horizon_length, xf, u_lim, PRPF, potential_weight, epsilon)
 RHC.init_optimizer()
 
-for i in tqdm(range(sim_length)):
+plotter = Plotter(x0, xf, PRPF, animate, plot_map)
 
-    u_opt, _ = RHC.solve(x[:, i:i+1])
+with plotter:
+    for i in tqdm(range(sim_length)):
 
-    x[:, i+1:i+2] = model.F(x[:, i:i+1], u_opt[:, 0])
-    u[:, i] = np.transpose(u_opt[:, 0])
+        u_opt, x_opt = RHC.solve(x[:, i:i+1])
 
-plot_state_traj(sim_length, model, x, u, xf)
-plot_opt_path_colormap(x0, xf, x, PRPF)
+        x[:, i+1:i+2] = model.F(x[:, i:i+1], u_opt[:, 0])
+        u[:, i] = np.transpose(u_opt[:, 0])
+        plotter.update(x, x_opt, i, 0.01)
+
+plot_state_traj(plot_state, sim_length, model, x, u, xf)
+

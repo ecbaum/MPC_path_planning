@@ -50,9 +50,9 @@ class Plotter:
 
         self.animate = animate
         self.plot = plot
-        self.figure = []
-        self.axes = []
-        self.X = []
+        self.figure = None
+        self.axes = None
+        self.X = None
 
     def __enter__(self):
         if self.animate or self.plot:

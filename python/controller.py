@@ -10,10 +10,10 @@ class RecedingHorizonController:
         self.PRPF = PRPF
         self.w = potential_weight
         self.e = epsilon
-        self.opti = []
-        self.x = []
-        self.u = []
-        self.p = []
+        self.opti = None
+        self.x = None
+        self.u = None
+        self.p = None
 
     def init_optimizer(self):
 

@@ -5,12 +5,12 @@ from tqdm import tqdm
 
 model = ConstantVelocityModel(h=0.2)
 
-sim_length = 50
-horizon_length = 70
+sim_length = 80
+horizon_length = 60
 potential_weight = 5
 epsilon = 0.01
-u_lim = 5*[-1, 1]
-PRPF = np.array([[2, 3], [2, 4], [2, 1], [3, 3]])
+u_lim = 10*[-1, 1]
+PRPF = np.array([[2, 3.5], [2, 3.2]])
 
 x0 = vertcat(0, 0, 0, 0)
 xf = vertcat(5, 5, 0, 0)
@@ -37,7 +37,7 @@ with plotter:
 
         x[:, i+1:i+2] = model.F(x[:, i:i+1], u_opt[:, 0])
         u[:, i] = np.transpose(u_opt[:, 0])
+
         plotter.update(x, x_opt, i, 0.01)
 
 plot_state_traj(plot_state, sim_length, model, x, u, xf)
-

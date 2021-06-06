@@ -3,11 +3,13 @@ from controller import *
 from helpers import *
 from tqdm import tqdm
 
-model = ConstantVelocityModel(h=0.2)
+model = ConstantVelocityModel(h=0.25)
 
-sim_length = 200
-
-horizon_length = 10
+sim_length = 280
+horizon_length = 5
+potential_weight = 3
+u_lim = [-1, 1]
+PRPF = np.array([[2, 2], [2, 1], [1, 4], [0, 3], [2, 3]])
 
 x0 = vertcat(0, 0, 0, 0)
 xf = vertcat(5, 5, 0, 0)
@@ -16,11 +18,8 @@ x = np.zeros([4, sim_length + 1])
 x[:, 0:1] = x0
 
 u = np.zeros([2, sim_length])
-u_lim = [-3, 3]
 
-PRPF = np.array([[2, 2], [2, 1], [1, 4]])
-
-RHC = RecedingHorizonController(model, horizon_length, xf, u_lim, PRPF)
+RHC = RecedingHorizonController(model, horizon_length, xf, u_lim, PRPF, potential_weight)
 RHC.init_optimizer()
 
 for i in tqdm(range(sim_length)):
@@ -31,4 +30,4 @@ for i in tqdm(range(sim_length)):
     u[:, i] = np.transpose(u_opt[:, 0])
 
 plot_state_traj(sim_length, model, x, u, xf)
-plot_opt_path(x0, xf, x, PRPF)
+plot_opt_path_colormap(x0, xf, x, PRPF)

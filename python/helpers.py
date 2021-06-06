@@ -38,3 +38,41 @@ def plot_opt_path(x0, xf, x, PRPF):
     ax.grid()
     ax.set_axisbelow(True)
 
+
+def plot_opt_path_colormap(x0, xf, x, PRPF):
+
+    pad_size = 0.1
+
+    x_range = np.hstack([x[0:1, :], xf[0]])[0]
+    y_range = np.hstack([x[1:2, :], xf[1]])[0]
+
+    pad_x = pad_size*(max(x_range) - min(x_range))
+    pad_y = pad_size*(max(y_range) - min(y_range))
+
+    b, a = np.meshgrid(np.linspace(min(x_range)-pad_x, max(x_range)+pad_x, 130),
+                       np.linspace(min(y_range)-pad_y, max(y_range)+pad_y, 130))
+
+    c = 0
+    for i in range(np.shape(PRPF)[0]):
+        x_0 = PRPF[i, 0]
+        y_0 = PRPF[i, 1]
+
+        c = c + 1 / ((a - x_0) ** 2 + (b - y_0) ** 2 + 0.1)
+
+    c = c[:-1, :-1]
+
+    l_a = a.min()
+    r_a = a.max()
+    l_b = b.min()
+    r_b = b.max()
+    l_c, r_c = -np.abs(c).max(), np.abs(c).max()
+
+    figure, axes = plt.subplots()
+
+    c = axes.pcolormesh(a, b, c, cmap='jet', vmin=l_c, vmax=r_c)
+    axes.axis([l_a, r_a, l_b, r_b])
+    plt.scatter(x[0, :], x[1, :], s=2, color='black', label='$x_k$')
+    plt.scatter(int(x0[0]), int(x0[1]), s=15, label='$x_0$')
+    plt.scatter(int(xf[0]), int(xf[1]), s=15, label='$x_f$')
+    plt.legend()
+    plt.show()

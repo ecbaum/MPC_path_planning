@@ -2,12 +2,13 @@ from casadi import *
 
 
 class RecedingHorizonController:
-    def __init__(self, model, horizon_length, xf, u_lim, PRPF):
+    def __init__(self, model, horizon_length, xf, u_lim, PRPF, potential_weight):
         self.model = model
         self.N = horizon_length
         self.xf = xf
         self.u_lim = u_lim
         self.PRPF = PRPF
+        self.w = potential_weight
         self.opti = []
         self.x = []
         self.u = []
@@ -24,7 +25,7 @@ class RecedingHorizonController:
         self.u = self.opti.variable(2, self.N)
         self.p = self.opti.parameter(4, 1)  # Parameter (not optimized over)
 
-        stage_cost = 0.1 * sumsqr(self.x - self.xf)
+        stage_cost = 1/self.w * sumsqr(self.x - self.xf)
 
         for k in range(self.N):
             for i in range(np.shape(self.PRPF)[0]):
@@ -37,9 +38,7 @@ class RecedingHorizonController:
             self.opti.subject_to(self.x[:, k + 1] == self.model.F(self.x[:, k], self.u[:, k]))
 
         self.opti.subject_to(self.opti.bounded(u_min, self.u, u_max))
-
         self.opti.subject_to(self.x[:, 0] == self.p)
-
         self.opti.solver('ipopt')
 
     def solve(self, x0):

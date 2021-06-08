@@ -2,30 +2,6 @@ import matplotlib.pyplot as plt
 from casadi import *
 
 
-def plot_state_traj(plot_state, sim_length, model, X, U, xf):
-    if not plot_state:
-        return
-    tgrid = np.linspace(0, (sim_length + 1) * model.h, sim_length + 1)
-    fig, axs = plt.subplots(2)
-    axs[0].plot(tgrid, X[0, :], label='$x$')
-    axs[0].plot(tgrid, np.ones([1, sim_length + 1])[0] * int(xf[0]), ':', label='$x_f$')
-    axs[0].step(tgrid, vertcat(U[0, :], np.nan), '--', linewidth=0.9, color='black', label='$u_x$')
-    axs[0].set_xlabel('t')
-    axs[0].set_xlim(0, max(tgrid))
-    axs[0].grid()
-    axs[0].legend()
-
-    axs[1].plot(tgrid, X[1, :], label='$y$')
-    axs[1].plot(tgrid, np.ones([1, sim_length + 1])[0] * int(xf[1]), ':', label='$y_f$')
-    axs[1].step(tgrid, vertcat(U[1, :], np.nan), '--', linewidth=0.9, color='black', label='$u_y$')
-    axs[1].set_xlabel('t')
-    axs[1].set_xlim(0, max(tgrid))
-    axs[1].grid()
-    axs[1].legend()
-
-    fig.tight_layout(pad=1.0)
-
-
 def plot_opt_path(x0, xf, x, PRPF, ax):
     ax.scatter(x[0, :], x[1, :], s=2, color='black', label='$x_k$')
     ax.scatter(int(x0[0]), int(x0[1]), s=15, label='$x_0$')
@@ -43,34 +19,51 @@ def plot_opt_path(x0, xf, x, PRPF, ax):
 
 
 class Plotter:
-    def __init__(self, x0, xf, PRPF, animate, plot):
-        self.x0 = x0
-        self.xf = xf
-        self.PRPF = PRPF
+    def __init__(self, animate, plot_map, plot_state):
 
         self.animate = animate
-        self.plot = plot
+        self.plot_map = plot_map
+        self.plot_state = plot_state
+
+        self.x0 = None
+        self.xf = None
+        self.PRPF = None
+        self.model = None
+        self.controller = None
         self.figure = None
         self.axes = None
         self.X = None
+        self.U = None
 
     def __enter__(self):
-        if self.animate or self.plot:
+        if self.animate or self.plot_map:
             self.init_map()
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        if self.plot:
+        if self.plot_map:
             self.axes.get_legend().remove()
             plt.scatter(self.X[0, :], self.X[1, :], s=2, color='black', label='Trajectory')
             plt.scatter(int(self.x0[0]), int(self.x0[1]), s=15)
             plt.scatter(int(self.xf[0]), int(self.xf[1]), s=15)
             plt.legend()
 
+        if self.plot_state:
+            self.plot_state_traj()
+
         return self
 
-    def update(self, X, x_pred, i, pause_time):
+    def set(self, inital, terminal, PRPF, model, controller):
+        self.x0 = inital
+        self.xf = terminal
+        self.PRPF = PRPF
+        self.model = model
+        self.controller = controller
+
+    def update(self, X, U, x_pred, i, pause_time):
         self.X = X
+        self.U = U
+
         if self.animate:
             dots1 = plt.scatter(X[0, 0:i], X[1, 0:i], s=2, color='black', label='Trajectory')
             dots2 = plt.scatter(x_pred[0, :], x_pred[1, :], s=2, color='red', label='Prediction')
@@ -114,3 +107,27 @@ class Plotter:
         plt.scatter(int(self.xf[0]), int(self.xf[1]), s=15, label='$x_f$')
         plt.legend()
         plt.show()
+
+    def plot_state_traj(self):
+
+        sim_length = np.shape(self.X)[1] - 1
+        tgrid = np.linspace(0, (sim_length + 1) * self.model.h, sim_length + 1)
+
+        fig, axs = plt.subplots(2)
+        axs[0].plot(tgrid, self.X[0, :], label='$x$')
+        axs[0].plot(tgrid, np.ones([1, sim_length + 1])[0] * int(self.xf[0]), ':', label='$x_f$')
+        axs[0].step(tgrid, vertcat(self.U[0, :], np.nan), '--', linewidth=0.9, color='black', label='$u_x$')
+        axs[0].set_xlabel('t')
+        axs[0].set_xlim(0, max(tgrid))
+        axs[0].grid()
+        axs[0].legend()
+
+        axs[1].plot(tgrid, self.X[1, :], label='$y$')
+        axs[1].plot(tgrid, np.ones([1, sim_length + 1])[0] * int(self.xf[1]), ':', label='$y_f$')
+        axs[1].step(tgrid, vertcat(self.U[1, :], np.nan), '--', linewidth=0.9, color='black', label='$u_y$')
+        axs[1].set_xlabel('t')
+        axs[1].set_xlim(0, max(tgrid))
+        axs[1].grid()
+        axs[1].legend()
+
+        fig.tight_layout(pad=1.0)

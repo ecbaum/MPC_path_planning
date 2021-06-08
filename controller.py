@@ -10,10 +10,13 @@ class RecedingHorizonController:
         self.PRPF = PRPF
         self.w = potential_weight
         self.e = epsilon
+
         self.opti = None
         self.x = None
         self.u = None
         self.p = None
+        self.cost_fnc = None
+        self.cost = None
 
     def init_optimizer(self):
 
@@ -22,9 +25,9 @@ class RecedingHorizonController:
 
         self.opti = casadi.Opti()
 
-        self.x = self.opti.variable(4, self.N + 1)  # Decision variables for state trajetcory
-        self.u = self.opti.variable(2, self.N)
-        self.p = self.opti.parameter(4, 1)  # Parameter (not optimized over)
+        self.x = self.opti.variable(self.model.n, self.N + 1)  # Decision variables for state trajetcory
+        self.u = self.opti.variable(self.model.m, self.N)
+        self.p = self.opti.parameter(self.model.n, 1)  # Parameter (not optimized over)
 
         stage_cost = 1/self.w * sumsqr(self.x - self.xf)
 
@@ -35,6 +38,9 @@ class RecedingHorizonController:
                 stage_cost = stage_cost + 1 / ((self.x[0, k] - x_0) ** 2 + (self.x[1, k] - y_0) ** 2 + self.e)
 
         self.opti.minimize(stage_cost)
+
+        self.cost_fnc = Function('cost', [self.x, self.u], [stage_cost])
+
         for k in range(self.N):
             self.opti.subject_to(self.x[:, k + 1] == self.model.F(self.x[:, k], self.u[:, k]))
 
@@ -50,6 +56,9 @@ class RecedingHorizonController:
         sol = self.opti.solve()
         sys.stdout = save_stdout
 
-        u_opt = sol.value(self.u)
         x_opt = sol.value(self.x)
-        return u_opt, x_opt
+        u_opt = sol.value(self.u)
+
+        self.cost = self.cost_fnc(x_opt, u_opt)
+
+        return x_opt, u_opt

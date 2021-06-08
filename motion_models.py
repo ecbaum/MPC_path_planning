@@ -5,6 +5,8 @@ class ConstantVelocityModel:
 
     def __init__(self, h):
         self.h = h
+        self.n = 4
+        self.m = 2
         self.F = None
         self.init_model()
 

@@ -46,15 +46,16 @@ class RecedingHorizonController:
 
         self.opti.subject_to(self.opti.bounded(u_min, self.u, u_max))
         self.opti.subject_to(self.x[:, 0] == self.p)
-        self.opti.solver('ipopt')
+
+        p_opts = dict(print_time=False, verbose=False)
+        s_opts = dict(print_level=0)
+
+        self.opti.solver('ipopt', p_opts, s_opts)
 
     def solve(self, x0):
-        self.opti.set_value(self.p, x0)
 
-        save_stdout = sys.stdout
-        sys.stdout = open('trash', 'w')
+        self.opti.set_value(self.p, x0)
         sol = self.opti.solve()
-        sys.stdout = save_stdout
 
         x_opt = sol.value(self.x)
         u_opt = sol.value(self.u)

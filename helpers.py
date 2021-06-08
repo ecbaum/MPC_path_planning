@@ -2,22 +2,6 @@ import matplotlib.pyplot as plt
 from casadi import *
 
 
-def plot_opt_path(x0, xf, x, PRPF, ax):
-    ax.scatter(x[0, :], x[1, :], s=2, color='black', label='$x_k$')
-    ax.scatter(int(x0[0]), int(x0[1]), s=15, label='$x_0$')
-    ax.scatter(int(xf[0]), int(xf[1]), s=15, label='$x_f$')
-    for i in range(np.shape(PRPF)[0]):
-        x_0 = PRPF[i, 0]
-        y_0 = PRPF[i, 1]
-        ax.scatter(int(x_0), int(y_0), s=20, color='green')
-
-    ax.set_xlabel('x')
-    ax.set_ylabel('y')
-    ax.legend()
-    ax.grid()
-    ax.set_axisbelow(True)
-
-
 class Plotter:
     def __init__(self, animate, plot_map, plot_state):
 

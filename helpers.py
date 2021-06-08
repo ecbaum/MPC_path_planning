@@ -96,7 +96,6 @@ class Plotter:
         for i in range(np.shape(self.PRPF)[0]):
             x_0 = self.PRPF[i, 0]
             y_0 = self.PRPF[i, 1]
-
             c = c + 1 / ((a - x_0) ** 2 + (b - y_0) ** 2 + 0.1)
 
         c = c[:-1, :-1]

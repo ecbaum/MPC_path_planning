@@ -42,3 +42,29 @@ ylabel('y')
 title('pointwise repulsive potential function')
 
 
+%% 2D sigmoid test
+clear all; clc
+%https://www.researchgate.net/figure/Color-online-Two-dimensional-sigmoid-functions-a-S-1-sigmoid-function-oriented-in_fig4_23294982
+
+
+
+
+phi = 0;
+tx = 0;
+ty = 0;
+e_x = 5;
+e_y = 200;
+beta_e = 6;
+
+
+U = @(x,y, tx, ty, phi, beta_e, e_x, e_y) ...
+    1-(1 + exp( -beta_e*( ...
+    (x*cos(phi) - tx*cos(phi) + ty*sin(phi) - y*sin(phi)).^2/e_x + ... 
+    (y*cos(phi) - ty*cos(phi) - tx*sin(phi) + x*sin(phi)).^2/e_y - 1))).^(-1);
+
+[X,Y] = meshgrid(-20:0.3:20,-20:0.3:20);
+
+Z = U(X,Y,tx, ty, phi, beta_e, e_x, e_y);
+
+surf(X,Y,Z)
+shading interp

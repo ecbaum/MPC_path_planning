@@ -5,19 +5,19 @@ from tqdm import tqdm
 
 model = ConstantVelocityModel(h=0.2)
 
-sim_length = 80
-horizon_length = 60
-potential_weight = 5
+sim_length = 100
+horizon_length = 25
+potential_weight = 3
 epsilon = 0.01
-u_lim = 10*[-1, 1]
-PRPF = np.array([[2, 3.5], [2, 3.2]])
+u_lim = 1*[-1, 1]
+PRPF = np.array([[3, 3], [4, 3]])
 
 x0 = vertcat(0, 0, 0, 0)
 xf = vertcat(5, 5, 0, 0)
 
 animate = 1
 plot_map = 1
-plot_state = 1
+plot_state = 0
 
 
 x = np.zeros([4, sim_length + 1])

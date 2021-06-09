@@ -14,8 +14,8 @@ epsilon = 0.2   # 1/height of potential
 u_constr = [[-1, 1],
             [-1, 1]]
 
-PRPF = np.array([[3, 3],
-                 [4, 3]])
+PRPF = [[3, 3],
+        [4, 3]]
 
 x0 = vertcat(0, 0, 0, 0)
 xf = vertcat(5, 5, 0, 0)
@@ -28,8 +28,8 @@ x = np.zeros([model.n, T + 1])
 u = np.zeros([model.m, T])
 x[:, 0:1] = x0
 
-pot_field = PotentialField(model.n)
-pot_field.add_pointwise_rep(PRPF, PW, epsilon)
+pot_field = PotentialField()
+pot_field.repulsive_point(PRPF, PW, epsilon)
 
 RHC = RecedingHorizonController(model, N, xf, u_constr, pot_field)
 RHC.init_optimizer()

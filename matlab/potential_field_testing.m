@@ -100,12 +100,13 @@ yp = 1;
 xq = -1;
 yq = 2;
 g3 = (yq-yp)*X-(xq-xp)*Y+xq*yp-yq*xp;
-
-xp = -2;
-yp = 3;
-xq = -3;
-yq = 2;
-g4 = (yq-yp)*X-(xq-xp)*Y+xq*yp-yq*xp;
+% 
+% xp = -10;
+% yp = 3;
+% xq = -10;
+% yq = 2;
+% g4 = (yq-yp)*X-(xq-xp)*Y+xq*yp-yq*xp;
+g4 = X.^2;
 
 f = g1+abs(g1) + g2+abs(g2) + g3+abs(g3) + g4+abs(g4);
 

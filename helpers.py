@@ -9,11 +9,12 @@ class Plotter:
         self.plot_map = plot_map
         self.plot_state = plot_state
 
-        self.x0 = None
-        self.xf = None
-        self.PRPF = None
+        self.pot_field = None
         self.model = None
         self.controller = None
+        self.x0 = None
+        self.xf = None
+
         self.figure = None
         self.axes = None
         self.X = None
@@ -37,12 +38,12 @@ class Plotter:
 
         return self
 
-    def set(self, inital, terminal, PRPF, model, controller):
+    def set(self, inital, model, controller, pot_field):
         self.x0 = inital
-        self.xf = terminal
-        self.PRPF = PRPF
         self.model = model
         self.controller = controller
+        self.pot_field = pot_field
+        self.xf = controller.xf
 
     def update(self, X, U, x_pred, i):
         self.X = X
@@ -66,27 +67,19 @@ class Plotter:
         pad_x = pad_size * (max(x_range) - min(x_range))
         pad_y = pad_size * (max(y_range) - min(y_range))
 
-        b, a = np.meshgrid(np.linspace(min(x_range) - pad_x, max(x_range) + pad_x, 130),
+        y, x = np.meshgrid(np.linspace(min(x_range) - pad_x, max(x_range) + pad_x, 130),
                            np.linspace(min(y_range) - pad_y, max(y_range) + pad_y, 130))
 
-        c = 0
-        for i in range(np.shape(self.PRPF)[0]):
-            x_0 = self.PRPF[i, 0]
-            y_0 = self.PRPF[i, 1]
-            c = c + 1 / ((a - x_0) ** 2 + (b - y_0) ** 2 + 0.1)
+        L = self.pot_field.get_stage()
+        z = L(x, y)
+        z = z[:-1, :-1]
 
-        c = c[:-1, :-1]
-
-        l_a = a.min()
-        r_a = a.max()
-        l_b = b.min()
-        r_b = b.max()
-        l_c, r_c = -np.abs(c).max(), np.abs(c).max()
+        l_z, r_z = -np.abs(z).max(), np.abs(z).max()
 
         self.figure, self.axes = plt.subplots()
 
-        self.axes.pcolormesh(a, b, c, cmap='jet', vmin=l_c, vmax=r_c)
-        self.axes.axis([l_a, r_a, l_b, r_b])
+        self.axes.pcolormesh(x, y, z, cmap='jet', vmin=l_z, vmax=r_z)
+        self.axes.axis([x.min(), x.max(), y.min(), y.max()])
         plt.scatter(int(self.x0[0]), int(self.x0[1]), s=15, label='$x_0$')
         plt.scatter(int(self.xf[0]), int(self.xf[1]), s=15, label='$x_f$')
         plt.legend()

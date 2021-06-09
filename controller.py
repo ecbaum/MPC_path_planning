@@ -30,7 +30,7 @@ class RecedingHorizonController:
         L = self.potential.get_stage()
 
         for k in range(self.N):
-            stage_cost = stage_cost + L(self.x[:, k])
+            stage_cost = stage_cost + L(self.x[0, k], self.x[1, k])
 
         self.opti.minimize(stage_cost)
 

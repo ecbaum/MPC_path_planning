@@ -1,3 +1,4 @@
+from potential_fields import *
 from motion_models import *
 from controller import *
 from helpers import *
@@ -13,6 +14,9 @@ epsilon = 0.01    # 1/height of potential
 u_lim = 1*[-1, 1]
 PRPF = np.array([[3, 3], [4, 3]])
 
+pot_field = PotentialField(model.n)
+pot_field.add_pointwise_rep(PRPF, PW, epsilon)
+
 x0 = vertcat(0, 0, 0, 0)
 xf = vertcat(5, 5, 0, 0)
 
@@ -25,7 +29,7 @@ x[:, 0:1] = x0
 
 u = np.zeros([model.m, T])
 
-RHC = RecedingHorizonController(model, N, xf, u_lim, PRPF, PW, epsilon)
+RHC = RecedingHorizonController(model, N, xf, u_lim, pot_field)
 RHC.init_optimizer()
 
 plotter.set(x0, xf, PRPF, model, RHC)
@@ -38,4 +42,4 @@ with plotter:
         x[:, i+1:i+2] = model.F(x[:, i:i+1], u_opt[:, 0])
         u[:, i] = np.transpose(u_opt[:, 0])
 
-        plotter.update(x, u, x_opt, i, 0.01)
+        plotter.update(x, u, x_opt, i)

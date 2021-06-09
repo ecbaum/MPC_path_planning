@@ -44,7 +44,7 @@ class Plotter:
         self.model = model
         self.controller = controller
 
-    def update(self, X, U, x_pred, i, pause_time):
+    def update(self, X, U, x_pred, i):
         self.X = X
         self.U = U
 
@@ -53,7 +53,7 @@ class Plotter:
             dots2 = plt.scatter(x_pred[0, :], x_pred[1, :], s=2, color='red', label='Prediction')
             plt.legend()
             plt.show()
-            plt.pause(pause_time)
+            plt.pause(0.01)
             dots1.remove()
             dots2.remove()
 

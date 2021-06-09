@@ -24,6 +24,9 @@ ylabel('y')
 
 
 %% pointwise repulsive potential function
+% Abbas, M.A., Milman, R. and Eklund, J.M., 2017. Obstacle avoidance in 
+% real time with nonlinear model predictive control of autonomous vehicles. 
+% Canadian journal of electrical and computer engineering, 40(1), pp.12-22.
 clear all; clc; close all
 
 
@@ -43,11 +46,11 @@ title('pointwise repulsive potential function')
 
 
 %% 2D sigmoid test
+% Benavente, R., Vanrell, M. and Baldrich, R., 2008. Parametric fuzzy sets 
+% for automatic color naming. JOSA A, 25(10), pp.2582-2593.
+
+
 clear all; clc
-%https://www.researchgate.net/figure/Color-online-Two-dimensional-sigmoid-functions-a-S-1-sigmoid-function-oriented-in_fig4_23294982
-
-
-
 
 phi = 0;
 tx = 0;
@@ -67,4 +70,47 @@ U = @(x,y, tx, ty, phi, beta_e, e_x, e_y) ...
 Z = U(X,Y,tx, ty, phi, beta_e, e_x, e_y);
 
 surf(X,Y,Z)
+shading interp
+
+
+%%
+% Hwang, Y.K. and Ahuja, N., 1992. A potential field approach to path 
+% planning. IEEE Transactions on Robotics and Automation, 8(1), pp.23-32.
+
+clear all; clc
+
+
+[X,Y] = meshgrid(-20:0.3:20,-20:0.3:20);
+
+
+xp = 0;
+yp = 1;
+xq = 1;
+yq = 2;
+g1 = (yq-yp)*X-(xq-xp)*Y+xq*yp-yq*xp;
+
+xp = 2;
+yp = 3;
+xq = 3;
+yq = 2;
+g2 = (yq-yp)*X-(xq-xp)*Y+xq*yp-yq*xp;
+
+xp = 0;
+yp = 1;
+xq = -1;
+yq = 2;
+g3 = (yq-yp)*X-(xq-xp)*Y+xq*yp-yq*xp;
+
+xp = -2;
+yp = 3;
+xq = -3;
+yq = 2;
+g4 = (yq-yp)*X-(xq-xp)*Y+xq*yp-yq*xp;
+
+f = g1+abs(g1) + g2+abs(g2) + g3+abs(g3) + g4+abs(g4);
+
+p = (1 + f).^(-1);
+
+
+surf(X,Y,p)
 shading interp

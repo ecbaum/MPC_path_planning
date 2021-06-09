@@ -6,13 +6,16 @@ from tqdm import tqdm
 
 model = ConstantVelocityModel(h=0.2)
 
-T = 40            # Simulation time
+T = 70            # Simulation time
 N = 40            # Prediction horizon length
 PW = 3            # Weight of potential
-epsilon = 0.5   # 1/height of potential
+epsilon = 0.2   # 1/height of potential
 
-u_lim = 1*[-1, 1]
-PRPF = np.array([[3, 3], [4, 3]])
+u_constr = [[-1, 1],
+            [-1, 1]]
+
+PRPF = np.array([[3, 3],
+                 [4, 3]])
 
 x0 = vertcat(0, 0, 0, 0)
 xf = vertcat(5, 5, 0, 0)
@@ -22,14 +25,13 @@ plotter = Plotter(animate=1,
                   plot_state=1)
 
 x = np.zeros([model.n, T + 1])
-x[:, 0:1] = x0
-
 u = np.zeros([model.m, T])
+x[:, 0:1] = x0
 
 pot_field = PotentialField(model.n)
 pot_field.add_pointwise_rep(PRPF, PW, epsilon)
 
-RHC = RecedingHorizonController(model, N, xf, u_lim, pot_field)
+RHC = RecedingHorizonController(model, N, xf, u_constr, pot_field)
 RHC.init_optimizer()
 
 plotter.set(x0, model, RHC, pot_field)

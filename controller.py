@@ -2,11 +2,11 @@ from casadi import *
 
 
 class RecedingHorizonController:
-    def __init__(self, model, horizon_length, xf, u_lim, potential):
+    def __init__(self, model, horizon_length, xf, u_constr, potential):
         self.model = model
         self.N = horizon_length
         self.xf = xf
-        self.u_lim = u_lim
+        self.u_constr = u_constr
         self.potential = potential
 
         self.opti = None
@@ -15,9 +15,6 @@ class RecedingHorizonController:
         self.p = None
 
     def init_optimizer(self):
-
-        u_min = self.u_lim[0]
-        u_max = self.u_lim[1]
 
         self.opti = casadi.Opti()
 
@@ -37,7 +34,10 @@ class RecedingHorizonController:
         for k in range(self.N):
             self.opti.subject_to(self.x[:, k + 1] == self.model.F(self.x[:, k], self.u[:, k]))
 
-        self.opti.subject_to(self.opti.bounded(u_min, self.u, u_max))
+        for i in range(np.shape(self.u_constr)[0]):
+            constr = self.u_constr[i]
+            self.opti.subject_to(self.opti.bounded(constr[0], self.u[i], constr[1]))
+
         self.opti.subject_to(self.x[:, 0] == self.p)
 
         p_opts = dict(print_time=False, verbose=False)

@@ -6,8 +6,8 @@ from tqdm import tqdm
 
 model = ConstantVelocityModel(h=0.2)
 
-T = 70            # Simulation time
-N = 40            # Prediction horizon length
+T = 80            # Simulation time
+N = 20            # Prediction horizon length
 PW = 3            # Weight of potential
 epsilon = 0.2   # 1/height of potential
 
@@ -16,6 +16,8 @@ u_constr = [[-1, 1],
 
 PRPF = [[3, 3],
         [4, 3]]
+
+v_set = [[2, 0], [2, 2.5], [2.1, 2.8], [2.2, 2.5], [2.2, 0]]
 
 x0 = vertcat(0, 0, 0, 0)
 xf = vertcat(5, 5, 0, 0)
@@ -29,7 +31,8 @@ u = np.zeros([model.m, T])
 x[:, 0:1] = x0
 
 pot_field = PotentialField()
-pot_field.repulsive_point(PRPF, PW, epsilon)
+#pot_field.repulsive_point(PRPF, PW, epsilon)
+pot_field.repulsive_polygon(v_set, 70, 0.1)
 
 RHC = RecedingHorizonController(model, N, xf, u_constr, pot_field)
 RHC.init_optimizer()
